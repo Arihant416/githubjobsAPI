@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import useFetchJobs from './useFetchJobs';
 import { Container } from 'react-bootstrap';
+import './App.css';
 import Job from './Job';
 function App() {
 	//eslint-disable-next-line
