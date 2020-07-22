@@ -1,4 +1,4 @@
-import { useReducer } from 'react';
+import { useReducer, useEffect } from 'react';
 import axios from 'axios';
 
 const ACTIONS = {
@@ -6,6 +6,8 @@ const ACTIONS = {
 	GET_DATA: 'get-data',
 	ERROR: 'error',
 };
+const baseURL =
+	'https://cors-anywhere.herokuapp.com/https://jobs.github.com/positions.json';
 function reducer(state, action) {
 	switch (action.type) {
 		case ACTIONS.MAKE_REQUEST:
@@ -25,9 +27,18 @@ function reducer(state, action) {
 }
 export default function useFetchJobs(params, page) {
 	const [state, dispatch] = useReducer(reducer, { jobs: [], loading: true });
-	return {
-		jobs: [],
-		loading: false,
-		error: false,
-	};
+	useEffect(() => {
+		dispatch({ type: ACTIONS.MAKE_REQUEST });
+		axios
+			.get(baseURL, {
+				params: { markdown: true, page: page, ...params },
+			})
+			.then(res => {
+				dispatch({ type: ACTIONS.GET_DATA, payload: { jobs: res.data } });
+			})
+			.catch(e => {
+				dispatch({ type: ACTIONS.ERROR, payload: { error: e } });
+			});
+	}, [params, page]);
+	return state;
 }
